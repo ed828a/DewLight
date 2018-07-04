@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
 import com.commit451.youtubeextractor.YouTubeExtraction
@@ -39,7 +40,7 @@ import kotlinx.android.synthetic.main.content_list.*
 class ExoVideoPlayActivity : AppCompatActivity() {
 
     private lateinit var videoModel: VideoModel
-    var isRelatedVideo: Boolean = false
+    private var isRelatedVideo: Boolean = false
     private lateinit var queryViewModel: DbVideoViewModel
     lateinit var adapter: VideoModelAdapter
     lateinit var listView: RecyclerView
@@ -52,15 +53,12 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private var currentWindow: Int = 0
     private var playWhenReady = true
     private var videoUrl: String = ""
-    lateinit var wl: PowerManager.WakeLock
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exo_video_play)
 
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wl = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, WAKE_TAG)
-        wl.acquire()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         videoModel = intent.getParcelableExtra(VIDEO_MODEL)
 
@@ -171,6 +169,11 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     }
 
     private fun bindVideoToPlayer(result: YouTubeExtraction) {
+        if (result.videoStreams.isEmpty()){
+            Toast.makeText(this@ExoVideoPlayActivity, "This video isn't playable. Please try others.", Toast.LENGTH_LONG).show()
+            return
+        }
+
         videoUrl = result.videoStreams.first().url
         playbackPosition = 0  // new video start
         Log.d("ExoMediaActivity", "videoUrl: $videoUrl")
@@ -276,8 +279,4 @@ class ExoVideoPlayActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        wl.release()
-        super.onDestroy()
-    }
 }

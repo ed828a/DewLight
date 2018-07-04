@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Dewbe</string>
+    <string name="app_name">DewLight</string>
     <string name="action_search">Search</string>
     <string name="action_settings">Settings</string>
     <string name="db_in_memory">DB in Memory</string>

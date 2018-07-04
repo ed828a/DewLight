@@ -14,15 +14,12 @@ import com.google.android.youtube.player.YouTubePlayer
 /**
  * Created by Edward on 6/26/2018.
  */
-class DewApp : MultiDexApplication() {
+class DewLightApp : MultiDexApplication() {
 
     companion object {
         lateinit var localBroadcastManager: LocalBroadcastManager
         var mYoutubePlayer: YouTubePlayer? = null
         lateinit var sharedPreferences: SharedPreferences
-        lateinit var playerType: String
-        var dbType: String = ""
-        var isDbEnabled = false
     }
 
     override fun onCreate() {
@@ -30,10 +27,5 @@ class DewApp : MultiDexApplication() {
         super.onCreate()
         localBroadcastManager = LocalBroadcastManager.getInstance(applicationContext)
         sharedPreferences = getSharedPreferences("DewApp", Context.MODE_PRIVATE)
-        playerType = sharedPreferences.getString(KEY_PLAYER_TYPE, "ExoPlayer")
-        isDbEnabled = sharedPreferences.getBoolean(KEY_IS_DB_ENABLED, false)
-        dbType = sharedPreferences.getString(KEY_DB_TYPE, "DB_On_Disk")
-
-        Log.d("DewApp", "playerType = $playerType, isDbEnabled = $isDbEnabled, dbType = $dbType")
     }
 }
