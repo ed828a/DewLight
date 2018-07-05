@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
-import android.os.PowerManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -22,8 +21,11 @@ import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.VideoModel
-import com.dew.edward.dewbe.util.*
-import com.dew.edward.dewbe.viewmodel.DbVideoViewModel
+import com.dew.edward.dewbe.util.GlideApp
+import com.dew.edward.dewbe.util.PLAYBACK_POSITION
+import com.dew.edward.dewbe.util.VIDEO_MODEL
+import com.dew.edward.dewbe.util.VIDEO_URL
+import com.dew.edward.dewbe.viewmodel.VideoViewModel
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -41,7 +43,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
 
     private lateinit var videoModel: VideoModel
     private var isRelatedVideo: Boolean = false
-    private lateinit var queryViewModel: DbVideoViewModel
+    private lateinit var queryViewModel: VideoViewModel
     lateinit var adapter: VideoModelAdapter
     lateinit var listView: RecyclerView
 
@@ -83,7 +85,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
                     )
         }
 
-        queryViewModel = DbVideoViewModel.getViewModel(this)
+        queryViewModel = VideoViewModel.getViewModel(this)
         if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
             textVideoPlayTitle?.text = videoModel.title
 

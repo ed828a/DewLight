@@ -27,7 +27,7 @@ import com.dew.edward.dewbe.util.DEFAULT_QUERY
 import com.dew.edward.dewbe.util.GlideApp
 import com.dew.edward.dewbe.util.KEY_QUERY
 import com.dew.edward.dewbe.util.VIDEO_MODEL
-import com.dew.edward.dewbe.viewmodel.DbVideoViewModel
+import com.dew.edward.dewbe.viewmodel.VideoViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 
@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
-    private lateinit var videoViewModel: DbVideoViewModel
+    private lateinit var videoViewModel: VideoViewModel
     private lateinit var preferences: SharedPreferences
     private lateinit var query: String
     private var searchView: SearchView? = null
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         query = preferences.getString(KEY_QUERY, DEFAULT_QUERY)
 
         initActionBar()
-        videoViewModel = DbVideoViewModel.getViewModel(this@MainActivity)
+        videoViewModel = VideoViewModel.getViewModel(this@MainActivity)
         initRecyclerView()
         initSwipeToRefresh()
 

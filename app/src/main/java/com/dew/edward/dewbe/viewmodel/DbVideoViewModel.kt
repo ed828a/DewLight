@@ -1,18 +1,17 @@
 package com.dew.edward.dewbe.viewmodel
 
 import android.arch.lifecycle.*
-import android.content.Context
 import android.support.v4.app.FragmentActivity
 import com.dew.edward.dewbe.model.QueryData
 import com.dew.edward.dewbe.model.Type
-import com.dew.edward.dewbe.repository.DbVideoModelRepository
+import com.dew.edward.dewbe.repository.YoutubeRepository
+import com.dew.edward.dewbe.util.PAGEDLIST_PAGE_SIZE
 
 
 /**
  * Created by Edward on 6/26/2018.
  */
-class DbVideoViewModel(context: Context): ViewModel() {
-    private val repository = DbVideoModelRepository(context)
+class VideoViewModel(private val repository: YoutubeRepository): ViewModel() {
 
     private val queryString = MutableLiveData<String>()
     private val relatedToVideoId = MutableLiveData<String>()
@@ -29,10 +28,7 @@ class DbVideoViewModel(context: Context): ViewModel() {
 
     private val searchResult =
             Transformations.map(queryData) {queryData ->
-                with(repository) {
-                    resetPageStatus()
-                    searchVideosOnYoutube(queryData)
-                }
+                repository.getRepository().searchVideoYoutube(queryData, PAGEDLIST_PAGE_SIZE)
             }
     val videoList = Transformations.switchMap(searchResult) { it.pagedList }!!
     val networkState = Transformations.switchMap(searchResult) { it.networkState }!!
@@ -64,11 +60,12 @@ class DbVideoViewModel(context: Context): ViewModel() {
     fun currentQuery(): String? = queryString.value
 
     companion object {
-        fun getViewModel(context: FragmentActivity): DbVideoViewModel =
+        fun getViewModel(context: FragmentActivity): VideoViewModel =
                 ViewModelProviders.of(context, object : ViewModelProvider.Factory {
+                    val repository = YoutubeRepository.getInstance()
                     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-                            DbVideoViewModel(context) as T
-                })[DbVideoViewModel::class.java]
+                            VideoViewModel(repository) as T
+                })[VideoViewModel::class.java]
     }
 }
 

@@ -6,7 +6,7 @@ import android.arch.paging.PagedList
 /**
  * Created by Edward on 6/26/2018.
  */
-data class Listing<T> (
+data class LiveDataPagedListing<T> (
 
         val pagedList: LiveData<PagedList<T>>,          // the LiveData of paged lists for the UI to observe
 

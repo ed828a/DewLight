@@ -5,9 +5,6 @@ import android.content.SharedPreferences
 import android.support.multidex.MultiDexApplication
 import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
-import com.dew.edward.dewbe.util.KEY_DB_TYPE
-import com.dew.edward.dewbe.util.KEY_IS_DB_ENABLED
-import com.dew.edward.dewbe.util.KEY_PLAYER_TYPE
 import com.google.android.youtube.player.YouTubePlayer
 
 
