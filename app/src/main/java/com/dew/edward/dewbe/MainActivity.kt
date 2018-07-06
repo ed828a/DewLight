@@ -24,7 +24,6 @@ import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.VideoModel
 import com.dew.edward.dewbe.ui.ExoVideoPlayActivity
 import com.dew.edward.dewbe.util.DEFAULT_QUERY
-import com.dew.edward.dewbe.util.GlideApp
 import com.dew.edward.dewbe.util.KEY_QUERY
 import com.dew.edward.dewbe.util.VIDEO_MODEL
 import com.dew.edward.dewbe.viewmodel.VideoViewModel
@@ -77,7 +76,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        val glide = GlideApp.with(this)
         val adapter = VideoModelAdapter(
                 { videoViewModel.retry() },
                 {

@@ -6,11 +6,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
 import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.VideoModel
-import com.dew.edward.dewbe.util.GlideApp
-import com.dew.edward.dewbe.util.GlideRequests
 import kotlinx.android.synthetic.main.cell_video.view.*
 
 /**
@@ -27,7 +27,7 @@ class VideoModelAdapter(private val retryCallback: () -> Unit,
                 val view = LayoutInflater.from(parent.context)
                         .inflate(R.layout.cell_video, parent, false)
                 //for test now
-                val glideRequests = GlideApp.with(parent.context)
+                val glideRequests: RequestManager = Glide.with(parent.context)
                 VideoModelViewHolder(view, glideRequests)
             }
             R.layout.cell_network_state -> NetworkStateItemViewHolder.create(parent, retryCallback)
@@ -100,7 +100,7 @@ class VideoModelAdapter(private val retryCallback: () -> Unit,
     }
 
     inner class VideoModelViewHolder(view: View,
-                                     private val glide: GlideRequests) : RecyclerView.ViewHolder(view) {
+                                     private val glide: RequestManager) : RecyclerView.ViewHolder(view) {
 
         private val textViewTitle = view.textViewTitle
         private val textViewDate = view.textViewDate
@@ -115,7 +115,7 @@ class VideoModelAdapter(private val retryCallback: () -> Unit,
         fun bind(videoModel: VideoModel) {
             textViewTitle.text = videoModel.title
             textViewDate.text = videoModel.date
-            glide.load(videoModel.thumbnail).centerCrop().into(imageViewThumb)
+            glide.load(videoModel.thumbnail).into(imageViewThumb)
         }
     }
 }

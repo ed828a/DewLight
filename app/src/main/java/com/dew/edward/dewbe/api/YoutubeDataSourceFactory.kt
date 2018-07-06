@@ -21,5 +21,4 @@ class YoutubeDataSourceFactory(
         sourceLiveData.postValue(source)
         return source
     }
-
 }

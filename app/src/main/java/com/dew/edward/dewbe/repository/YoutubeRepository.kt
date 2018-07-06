@@ -19,13 +19,13 @@ class YoutubeRepository private constructor() {
 
     private val networkExecutor = Executors.newFixedThreadPool(5)
     private val onceExecutor = Executors.newSingleThreadExecutor()
-    private val api by lazy { YoutubeAPI.create() }
+        private val api by lazy { YoutubeAPI.create() }
+
     val isSucessful = MutableLiveData<Boolean>()
 
 
-
     fun getRepository() =
-            InMemoryByPageKeyedRepository (youtubeApi = api, networkExecutor = this.networkExecutor)
+            InMemoryByPageKeyedRepository(youtubeApi = api, networkExecutor = this.networkExecutor)
 
     companion object {
         private val TAG = YoutubeRepository::class.java.simpleName
@@ -41,7 +41,7 @@ class YoutubeRepository private constructor() {
         }
     }
 
-    fun downloadV(urlString: String, fileName: String){
+    fun downloadV(urlString: String, fileName: String) {
 
     }
 
@@ -60,9 +60,9 @@ class YoutubeRepository private constructor() {
             inputStream = responseBody.byteStream()
             outputStream = FileOutputStream(file)
 
-            while (true){
+            while (true) {
                 val read = inputStream.read(fileReader)
-                if (read == -1){
+                if (read == -1) {
                     break
                 }
                 outputStream.write(fileReader, 0, read)
@@ -82,7 +82,7 @@ class YoutubeRepository private constructor() {
         }
     }
 
-    private val functions = fun (urlString: String, fileName: String){
+    private val functions = fun(urlString: String, fileName: String) {
         val call = api.downloadByUrlStream(urlString)
         call.enqueue(object : Callback<ResponseBody> {
             override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
@@ -91,7 +91,7 @@ class YoutubeRepository private constructor() {
             }
 
             override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
-                if (response != null && response.isSuccessful){
+                if (response != null && response.isSuccessful) {
                     onceExecutor.execute {
                         val isFinished = writeResponseBodyToDisk(fileName, response.body()!!)
                         isSucessful.postValue(isFinished)

@@ -18,6 +18,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.commit451.youtubeextractor.YouTubeExtraction
 import com.commit451.youtubeextractor.YouTubeExtractor
 import com.dew.edward.dewbe.R
@@ -34,8 +35,6 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.google.android.youtube.player.internal.i
-import com.google.android.youtube.player.internal.t
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_exo_video_play.*
@@ -46,8 +45,8 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private lateinit var videoModel: VideoModel
     private var isRelatedVideo: Boolean = false
     private lateinit var queryViewModel: VideoViewModel
-    lateinit var adapter: VideoModelAdapter
-    lateinit var listView: RecyclerView
+    private lateinit var adapter: VideoModelAdapter
+    private lateinit var listView: RecyclerView
 
     private lateinit var extractor:YouTubeExtractor
 
@@ -83,6 +82,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
         }
 
         queryViewModel = VideoViewModel.getViewModel(this)
+
         if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
             textVideoPlayTitle?.text = videoModel.title
 
@@ -127,7 +127,6 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private fun initRelatedList() {
         listView = recyclerRelatedListView
         listView.layoutManager = GridLayoutManager(this, 2)
-        val glide = GlideApp.with(this)
         adapter = VideoModelAdapter(
                 { queryViewModel.retry() },
                 {
@@ -222,7 +221,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private fun initializePlayer(context: Context, videoUrl: String) {
         if (player == null) {
             player = ExoPlayerFactory.newSimpleInstance(
-                    DefaultRenderersFactory(this),
+                    DefaultRenderersFactory(context),
                     DefaultTrackSelector(),
                     DefaultLoadControl())
 
