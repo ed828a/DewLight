@@ -4,8 +4,11 @@ import android.arch.lifecycle.Observer
 import android.arch.paging.PagedList
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -21,10 +24,7 @@ import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.VideoModel
-import com.dew.edward.dewbe.util.GlideApp
-import com.dew.edward.dewbe.util.PLAYBACK_POSITION
-import com.dew.edward.dewbe.util.VIDEO_MODEL
-import com.dew.edward.dewbe.util.VIDEO_URL
+import com.dew.edward.dewbe.util.*
 import com.dew.edward.dewbe.viewmodel.VideoViewModel
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
@@ -34,6 +34,8 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.youtube.player.internal.i
+import com.google.android.youtube.player.internal.t
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_exo_video_play.*
@@ -60,6 +62,11 @@ class ExoVideoPlayActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exo_video_play)
 
+        if (ContextCompat.checkSelfPermission(this@ExoVideoPlayActivity,
+                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this@ExoVideoPlayActivity,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST)
+        }
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         videoModel = intent.getParcelableExtra(VIDEO_MODEL)
@@ -72,17 +79,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
 
             Log.d("onCreate", "playbackPosition = $playbackPosition")
         } else {
-            extractor.extract(videoModel.videoId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(
-                            { extraction ->
-                                bindVideoToPlayer(extraction)
-                            },
-                            { error ->
-                                errorHandler(error)
-                            }
-                    )
+            extractUrl()
         }
 
         queryViewModel = VideoViewModel.getViewModel(this)
@@ -91,11 +88,42 @@ class ExoVideoPlayActivity : AppCompatActivity() {
 
             initRelatedList()
             initSearch()
-
+            initDownload()
             queryViewModel.showRelatedToVideoId(videoModel.videoId)
         }
 
     }
+
+    private fun extractUrl(){
+        extractor.extract(videoModel.videoId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        { extraction ->
+                            bindVideoToPlayer(extraction)
+                        },
+                        { error ->
+                            errorHandler(error)
+                        }
+                )
+    }
+
+    private fun initDownload(){
+        queryViewModel.downloadState.observe(this, Observer{ isSuccessful ->
+            if (isSuccessful != null && isSuccessful){
+                Toast.makeText(this@ExoVideoPlayActivity,
+                        "Downloading completed successfully.",
+                        Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this@ExoVideoPlayActivity,
+                        "Downloading failed.", Toast.LENGTH_SHORT).show()
+            }
+        })
+        buttonDownload.setOnClickListener {
+            queryViewModel.download(videoUrl)
+        }
+    }
+
     private fun initRelatedList() {
         listView = recyclerRelatedListView
         listView.layoutManager = GridLayoutManager(this, 2)
@@ -172,7 +200,8 @@ class ExoVideoPlayActivity : AppCompatActivity() {
 
     private fun bindVideoToPlayer(result: YouTubeExtraction) {
         if (result.videoStreams.isEmpty()){
-            Toast.makeText(this@ExoVideoPlayActivity, "This video isn't playable. Please try others.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this@ExoVideoPlayActivity,
+                    "This video isn't playable. Please try others.", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -260,18 +289,10 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     }
 
     private val videoListObserver =
-            object : Observer<PagedList<VideoModel>> {
-                override fun onChanged(videoList: PagedList<VideoModel>?) {
-                    adapter.submitList(videoList)
-                }
-            }
+            Observer<PagedList<VideoModel>> { videoList -> adapter.submitList(videoList) }
 
     private val networkStateObserver =
-            object : Observer<NetworkState?> {
-                override fun onChanged(networkState: NetworkState?) {
-                    adapter.setNetworkState(networkState)
-                }
-            }
+            Observer<NetworkState?> { networkState -> adapter.setNetworkState(networkState) }
 
     fun fullscreen(view: View){
         requestedOrientation = if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT){
