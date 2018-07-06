@@ -53,5 +53,4 @@ class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
 
         return searchResult.refreshState
     }
-
 }

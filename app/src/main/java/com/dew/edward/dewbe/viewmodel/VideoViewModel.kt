@@ -33,7 +33,11 @@ class VideoViewModel(private val repository: YoutubeRepository): ViewModel() {
     val videoList = Transformations.switchMap(searchResult) { it.pagedList }!!
     val networkState = Transformations.switchMap(searchResult) { it.networkState }!!
     val refreshState = Transformations.switchMap(searchResult) { it.refreshState }!!
+    val downloadState: LiveData<Boolean> = Transformations.map(repository.isSucessful) {it -> it }
 
+    fun download(url: String){
+        repository.downloadV(url, relatedToVideoId.value ?: "video")
+    }
     fun refresh() {
         searchResult.value?.refresh?.invoke()
     }

@@ -16,4 +16,4 @@ const val DEFAULT_QUERY = "trump"
 const val VIDEO_MODEL = "video_model"
 const val PLAYBACK_POSITION = "playback_position"
 const val VIDEO_URL = "video_url"
-
+const val PERMISSION_REQUEST = 88
