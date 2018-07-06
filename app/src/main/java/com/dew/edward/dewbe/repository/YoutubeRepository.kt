@@ -42,26 +42,7 @@ class YoutubeRepository private constructor() {
     }
 
     fun downloadV(urlString: String, fileName: String){
-        val call = api.downloadByUrlStream(urlString)
-        call.enqueue(object : Callback<ResponseBody>{
-            override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
-                t?.printStackTrace()
-                Log.d(TAG, "downloading failed: ${t?.message}")
-            }
 
-            override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
-                if (response != null && response.isSuccessful){
-                    onceExecutor.execute {
-                        val isFinished = writeResponseBodyToDisk(fileName, response.body()!!)
-                        isSucessful.postValue(isFinished)
-                        Log.d(TAG, "downloading completed successfully.")
-                    }
-                } else {
-                    isSucessful.postValue(false)
-                    Log.d(TAG, "Response Error: ${response?.message()}")
-                }
-            }
-        })
     }
 
     private fun writeResponseBodyToDisk(fileName: String, responseBody: ResponseBody): Boolean {
@@ -99,5 +80,28 @@ class YoutubeRepository private constructor() {
             inputStream?.close()
             outputStream?.close()
         }
+    }
+
+    private val functions = fun (urlString: String, fileName: String){
+        val call = api.downloadByUrlStream(urlString)
+        call.enqueue(object : Callback<ResponseBody> {
+            override fun onFailure(call: Call<ResponseBody>?, t: Throwable?) {
+                t?.printStackTrace()
+                Log.d(YoutubeRepository.TAG, "downloading failed: ${t?.message}")
+            }
+
+            override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                if (response != null && response.isSuccessful){
+                    onceExecutor.execute {
+                        val isFinished = writeResponseBodyToDisk(fileName, response.body()!!)
+                        isSucessful.postValue(isFinished)
+                        Log.d(YoutubeRepository.TAG, "downloading completed successfully.")
+                    }
+                } else {
+                    isSucessful.postValue(false)
+                    Log.d(YoutubeRepository.TAG, "Response Error: ${response?.message()}")
+                }
+            }
+        })
     }
 }

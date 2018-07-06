@@ -2,9 +2,9 @@ package com.dew.edward.dewbe.api
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.paging.DataSource
+import com.dew.edward.dewbe.model.QueryData
 import com.dew.edward.dewbe.model.VideoModel
 import java.util.concurrent.Executor
-import com.dew.edward.dewbe.model.QueryData
 
 /**
  * Created by Edward on 7/4/2018.
