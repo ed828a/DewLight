@@ -1,7 +1,6 @@
 package com.dew.edward.dewbe.api
 
 
-import android.net.Uri
 import android.util.Log
 import com.dew.edward.dewbe.model.YoutubeResponseData
 import com.dew.edward.dewbe.util.API_KEY

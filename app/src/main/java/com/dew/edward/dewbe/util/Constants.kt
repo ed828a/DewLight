@@ -7,7 +7,7 @@ package com.dew.edward.dewbe.util
 
 const val YOUTUBE_BASE_URL = "https://www.googleapis.com/youtube/v3/"
 const val NETWORK_PAGE_SIZE = 50  //Values must be within the range: [0, 50]
-const val PAGEDLIST_PAGE_SIZE = 10  // should be 20
+const val PAGEDLIST_PAGE_SIZE = 15  // should be 20
 const val API_KEY = "AIzaSyA7cdJ8OPftCtkqIBpVuIX5CVtY7BW02JU"
 const val KEY_QUERY = "query"
 const val DEFAULT_QUERY = "trump"
