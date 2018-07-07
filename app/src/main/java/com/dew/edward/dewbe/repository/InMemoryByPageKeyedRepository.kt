@@ -13,8 +13,6 @@ import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.QueryData
 import com.dew.edward.dewbe.model.VideoModel
 import com.dew.edward.dewbe.util.PAGEDLIST_PAGE_SIZE
-import com.dew.edward.dewbe.util.PagingRequestHelper
-import com.dew.edward.dewbe.util.createStatusLiveData
 import java.util.concurrent.Executor
 
 
@@ -39,8 +37,6 @@ class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
                         .build()
 
         val refreshTrigger = MutableLiveData<Unit>()
-//        val refreshState =
-//                Transformations.switchMap(refreshTrigger) { refresh(searchYoutube) }
 
         return LiveDataPagedListing(
                 pagedList = livePagedList,
@@ -60,10 +56,7 @@ class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
      */
     @MainThread
     private fun refresh(queryData: QueryData): LiveData<NetworkState> {
-        Log.d("InMemRepository", "refresh(QueryData) called")
-
         searchVideoYoutube(queryData, PAGEDLIST_PAGE_SIZE)
-
         _networkState.postValue(NetworkState.LOADED)
         return networkState
     }

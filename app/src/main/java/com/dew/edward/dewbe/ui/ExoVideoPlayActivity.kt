@@ -18,7 +18,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
-import com.bumptech.glide.Glide
 import com.commit451.youtubeextractor.YouTubeExtraction
 import com.commit451.youtubeextractor.YouTubeExtractor
 import com.dew.edward.dewbe.R
@@ -81,7 +80,6 @@ class ExoVideoPlayActivity : AppCompatActivity() {
             playbackPosition = savedInstanceState.getLong(PLAYBACK_POSITION)
             videoUrl = savedInstanceState.getString(VIDEO_URL)
 
-            Log.d("onCreate", "playbackPosition = $playbackPosition")
         } else {
             extractUrl(videoModel.videoId)
         }
@@ -177,7 +175,6 @@ class ExoVideoPlayActivity : AppCompatActivity() {
                 buttonDownload.visibility = View.VISIBLE
                 textVideoPlayTitle.visibility = View.VISIBLE
 
-                Log.d("onQueryTextSubmit", "queryString: $query")
                 return false
             }
 
@@ -225,7 +222,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
             videoView.player = player
             player!!.playWhenReady = playWhenReady
             player!!.seekTo(currentWindow, playbackPosition)
-            Log.d("initializePlayer", "playbackPosition = $playbackPosition")
+
         }
         val uri = Uri.parse(videoUrl)
         val mediaSource =
@@ -251,7 +248,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
         }
         outState?.putLong(PLAYBACK_POSITION, playbackPosition)
         outState?.putString(VIDEO_URL, videoUrl)
-        Log.d("onSaveInstanceState", "playbackPosition = $playbackPosition")
+
     }
 
     public override fun onStart() {
@@ -299,7 +296,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        Log.d("onBackPressed", "deep called")
+
         val backList = backStack.pop()
         if (backList == null) {
             super.onBackPressed()

@@ -31,10 +31,8 @@ class YoutubeRepository private constructor() {
         private val LOCK = Any()
         private var instance: YoutubeRepository? = null
         fun getInstance(): YoutubeRepository {
-            instance
-                    ?: synchronized(LOCK) {
-                        instance
-                                ?: YoutubeRepository().also { instance = it }
+            instance ?: synchronized(LOCK) {
+                        instance ?: YoutubeRepository().also { instance = it }
                     }
             return instance!!
         }

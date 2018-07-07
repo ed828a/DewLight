@@ -28,25 +28,3 @@ fun String.extractDate(): String {
     return stringArray[0]
 }
 
-private fun getErrorMessage(report: PagingRequestHelper.StatusReport): String {
-    return PagingRequestHelper.RequestType.values().mapNotNull {
-        report.getErrorFor(it)?.message
-    }.first()
-}
-
-fun PagingRequestHelper.createStatusLiveData(): LiveData<NetworkState> {
-    val liveData = MutableLiveData<NetworkState>()
-    addListener { report ->
-        //when can also be used as a replacement for an if-else if chain. If no argument is supplied,
-        // the branch conditions are simply boolean expressions,
-        // and a branch is executed when its condition is true:
-        when {
-            report.hasRunning() -> liveData.postValue(NetworkState.LOADING)
-            report.hasError() -> liveData.postValue(
-                    NetworkState.error(getErrorMessage(report)))
-            else -> liveData.postValue(NetworkState.LOADED)
-        }
-        Log.d("PagingRequestHelper", "createStatusLiveData, refresh listened: ${liveData.toString()}")
-    }
-    return liveData
-}

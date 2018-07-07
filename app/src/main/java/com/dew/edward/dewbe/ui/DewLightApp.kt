@@ -20,11 +20,9 @@ class DewLightApp : MultiDexApplication() {
     }
 
     override fun onCreate() {
-        Log.d("DewApp", "onCreate() called")
+
         super.onCreate()
         localBroadcastManager = LocalBroadcastManager.getInstance(applicationContext)
         sharedPreferences = getSharedPreferences("DewApp", Context.MODE_PRIVATE)
     }
-
-
 }

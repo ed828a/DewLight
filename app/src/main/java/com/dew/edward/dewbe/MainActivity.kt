@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) {
             query = savedInstanceState.getString(KEY_QUERY)
         }
-        Log.d(TAG, "onCreate, query = $query")
+
         videoViewModel.showSearchQuery(query)
     }
 
@@ -104,7 +104,6 @@ class MainActivity : AppCompatActivity() {
     private fun initSwipeToRefresh() {
         videoViewModel.refreshState.observe(this, Observer {
             swipeRefreshLayout.isRefreshing = (it == NetworkState.LOADING)
-            Log.d(TAG, "refreshState observed: swipeRefreshLayout.isRefreshing = ${it == NetworkState.LOADING}")
         })
         swipeRefreshLayout.setOnRefreshListener {
             videoViewModel.refresh()
@@ -140,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                 hideKeyboard()
                 searchView.clearFocus()
                 searchView.setQuery("", false)
-                Log.d("initSearchView", "queryString: ${query?.trim()}")
+
                 return true
             }
 
