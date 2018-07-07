@@ -103,7 +103,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun initSwipeToRefresh() {
         videoViewModel.refreshState.observe(this, Observer {
-            swipeRefreshLayout.isRefreshing = it == NetworkState.LOADING
+            swipeRefreshLayout.isRefreshing = (it == NetworkState.LOADING)
+            Log.d(TAG, "refreshState observed: swipeRefreshLayout.isRefreshing = ${it == NetworkState.LOADING}")
         })
         swipeRefreshLayout.setOnRefreshListener {
             videoViewModel.refresh()

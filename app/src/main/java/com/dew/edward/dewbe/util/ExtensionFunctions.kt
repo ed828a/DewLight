@@ -2,6 +2,7 @@ package com.dew.edward.dewbe.util
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.util.Log
 import com.dew.edward.dewbe.model.NetworkState
 
 
@@ -45,6 +46,7 @@ fun PagingRequestHelper.createStatusLiveData(): LiveData<NetworkState> {
                     NetworkState.error(getErrorMessage(report)))
             else -> liveData.postValue(NetworkState.LOADED)
         }
+        Log.d("PagingRequestHelper", "createStatusLiveData, refresh listened: ${liveData.toString()}")
     }
     return liveData
 }

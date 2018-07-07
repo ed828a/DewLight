@@ -1,9 +1,11 @@
 package com.dew.edward.dewbe.repository
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.paging.LivePagedListBuilder
 import android.support.annotation.MainThread
+import android.util.Log
 import com.dew.edward.dewbe.api.YoutubeAPI
 import com.dew.edward.dewbe.api.YoutubeDataSourceFactory
 import com.dew.edward.dewbe.model.LiveDataPagedListing
@@ -11,6 +13,8 @@ import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.QueryData
 import com.dew.edward.dewbe.model.VideoModel
 import com.dew.edward.dewbe.util.PAGEDLIST_PAGE_SIZE
+import com.dew.edward.dewbe.util.PagingRequestHelper
+import com.dew.edward.dewbe.util.createStatusLiveData
 import java.util.concurrent.Executor
 
 
@@ -19,6 +23,10 @@ import java.util.concurrent.Executor
  */
 class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
                                     private val networkExecutor: Executor) {
+
+    private val _networkState = MutableLiveData<NetworkState>()
+    private val networkState: LiveData<NetworkState>
+        get() = _networkState
 
     @MainThread  // this function will be called in ViewModel for search videos
     fun searchVideoYoutube(searchYoutube: QueryData, pageSize: Int): LiveDataPagedListing<VideoModel> {
@@ -30,11 +38,15 @@ class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
                         .setFetchExecutor(networkExecutor)
                         .build()
 
+        val refreshTrigger = MutableLiveData<Unit>()
+//        val refreshState =
+//                Transformations.switchMap(refreshTrigger) { refresh(searchYoutube) }
+
         return LiveDataPagedListing(
                 pagedList = livePagedList,
                 networkState = Transformations.switchMap(sourceFactory.sourceLiveData) { it.networkState },
-                refreshState = Transformations.switchMap(sourceFactory.sourceLiveData) { it.initialLoad },
-                refresh = { sourceFactory.sourceLiveData.value?.retryAllFailed() },
+                refreshState = Transformations.switchMap(refreshTrigger) { refresh(searchYoutube) },
+                refresh = { refreshTrigger.value = null },
                 retry = { sourceFactory.sourceLiveData.value?.retryAllFailed() }
         )
     }
@@ -48,9 +60,11 @@ class InMemoryByPageKeyedRepository(private val youtubeApi: YoutubeAPI,
      */
     @MainThread
     private fun refresh(queryData: QueryData): LiveData<NetworkState> {
+        Log.d("InMemRepository", "refresh(QueryData) called")
 
-        val searchResult = searchVideoYoutube(queryData, PAGEDLIST_PAGE_SIZE)
+        searchVideoYoutube(queryData, PAGEDLIST_PAGE_SIZE)
 
-        return searchResult.refreshState
+        _networkState.postValue(NetworkState.LOADED)
+        return networkState
     }
 }
