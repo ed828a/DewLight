@@ -24,6 +24,8 @@ import com.commit451.youtubeextractor.YouTubeExtractor
 import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
+import com.dew.edward.dewbe.model.QueryData
+import com.dew.edward.dewbe.model.Type
 import com.dew.edward.dewbe.model.VideoModel
 import com.dew.edward.dewbe.util.*
 import com.dew.edward.dewbe.viewmodel.VideoViewModel
@@ -48,7 +50,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private lateinit var adapter: VideoModelAdapter
     private lateinit var listView: RecyclerView
 
-    private lateinit var extractor:YouTubeExtractor
+    private lateinit var extractor: YouTubeExtractor
 
     // bandwidth meter to measure and estimate bandwidth
     private var player: SimpleExoPlayer? = null
@@ -56,6 +58,9 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private var currentWindow: Int = 0
     private var playWhenReady = true
     private var videoUrl: String = ""
+
+    // backing
+    private val backStack = DewStack<QueryData>(BACKING_STEPS)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +83,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
 
             Log.d("onCreate", "playbackPosition = $playbackPosition")
         } else {
-            extractUrl()
+            extractUrl(videoModel.videoId)
         }
 
         queryViewModel = VideoViewModel.getViewModel(this)
@@ -90,12 +95,13 @@ class ExoVideoPlayActivity : AppCompatActivity() {
             initSearch()
             initDownload()
             queryViewModel.showRelatedToVideoId(videoModel.videoId)
+            backStack.push(QueryData(videoModel.videoId, type = Type.RELATED_VIDEO_ID))
         }
 
     }
 
-    private fun extractUrl(){
-        extractor.extract(videoModel.videoId)
+    private fun extractUrl(videoId: String) {
+        extractor.extract(videoId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -108,9 +114,9 @@ class ExoVideoPlayActivity : AppCompatActivity() {
                 )
     }
 
-    private fun initDownload(){
-        queryViewModel.downloadState.observe(this, Observer{ isSuccessful ->
-            if (isSuccessful != null && isSuccessful){
+    private fun initDownload() {
+        queryViewModel.downloadState.observe(this, Observer { isSuccessful ->
+            if (isSuccessful != null && isSuccessful) {
                 Toast.makeText(this@ExoVideoPlayActivity,
                         "Downloading completed successfully.",
                         Toast.LENGTH_SHORT).show()
@@ -130,18 +136,8 @@ class ExoVideoPlayActivity : AppCompatActivity() {
         adapter = VideoModelAdapter(
                 { queryViewModel.retry() },
                 {
-                    extractor.extract(it.videoId)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe (
-                                    {extraction ->
-                                        bindVideoToPlayer(extraction)
-                                    },
-                                    {error ->
-                                        errorHandler(error)
-                                    }
-                            )
-
+                    extractUrl(it.videoId)
+                    backStack.push(QueryData(it.videoId, type = Type.RELATED_VIDEO_ID))
                     textVideoPlayTitle?.text = it.title
                     isRelatedVideo = true
                     intent.putExtra(VIDEO_MODEL, it)
@@ -172,6 +168,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
                         if (queryViewModel.showSearchQuery(it)) {
                             listView.scrollToPosition(0)
                             (listView.adapter as? VideoModelAdapter)?.submitList(null)
+                            backStack.push(QueryData(it, type = Type.QUERY_STRING))
                         }
                     }
                 }
@@ -198,7 +195,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     }
 
     private fun bindVideoToPlayer(result: YouTubeExtraction) {
-        if (result.videoStreams.isEmpty()){
+        if (result.videoStreams.isEmpty()) {
             Toast.makeText(this@ExoVideoPlayActivity,
                     "This video isn't playable. Please try others.", Toast.LENGTH_LONG).show()
             return
@@ -293,12 +290,27 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     private val networkStateObserver =
             Observer<NetworkState?> { networkState -> adapter.setNetworkState(networkState) }
 
-    fun fullscreen(view: View){
-        requestedOrientation = if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT){
+    fun fullscreen(view: View) {
+        requestedOrientation = if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
             ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         } else {
             ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
     }
 
+    override fun onBackPressed() {
+        Log.d("onBackPressed", "deep called")
+        val backList = backStack.pop()
+        if (backList == null) {
+            super.onBackPressed()
+        } else {
+            if ((backList.type == Type.RELATED_VIDEO_ID &&
+                            queryViewModel.showRelatedToVideoId(backList.query)) ||
+                    (backList.type == Type.QUERY_STRING &&
+                            queryViewModel.showSearchQuery(backList.query))) {
+                listView.scrollToPosition(0)
+                (listView.adapter as? VideoModelAdapter)?.submitList(null)
+            }
+        }
+    }
 }

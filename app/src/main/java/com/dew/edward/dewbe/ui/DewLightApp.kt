@@ -25,4 +25,6 @@ class DewLightApp : MultiDexApplication() {
         localBroadcastManager = LocalBroadcastManager.getInstance(applicationContext)
         sharedPreferences = getSharedPreferences("DewApp", Context.MODE_PRIVATE)
     }
+
+
 }

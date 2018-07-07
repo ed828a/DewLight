@@ -23,7 +23,6 @@ class YoutubeRepository private constructor() {
 
     val isSucessful = MutableLiveData<Boolean>()
 
-
     fun getRepository() =
             InMemoryByPageKeyedRepository(youtubeApi = api, networkExecutor = this.networkExecutor)
 
