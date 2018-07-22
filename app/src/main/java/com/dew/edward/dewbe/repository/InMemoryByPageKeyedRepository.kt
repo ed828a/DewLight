@@ -5,7 +5,6 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.paging.LivePagedListBuilder
 import android.support.annotation.MainThread
-import android.util.Log
 import com.dew.edward.dewbe.api.YoutubeAPI
 import com.dew.edward.dewbe.api.YoutubeDataSourceFactory
 import com.dew.edward.dewbe.model.LiveDataPagedListing

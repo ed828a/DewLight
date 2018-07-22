@@ -64,6 +64,7 @@ class VideoViewModel(private val repository: YoutubeRepository): ViewModel() {
     fun currentQuery(): String? = queryString.value
 
     companion object {
+        @SuppressWarnings("Unchecked cast")
         fun getViewModel(context: FragmentActivity): VideoViewModel =
                 ViewModelProviders.of(context, object : ViewModelProvider.Factory {
                     val repository = YoutubeRepository.getInstance()

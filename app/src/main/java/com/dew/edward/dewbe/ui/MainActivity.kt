@@ -1,4 +1,4 @@
-package com.dew.edward.dewbe
+package com.dew.edward.dewbe.ui
 
 
 import android.arch.lifecycle.Observer
@@ -14,15 +14,15 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.Gravity
 import android.view.Menu
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
 import com.dew.edward.dewbe.model.VideoModel
-import com.dew.edward.dewbe.ui.ExoVideoPlayActivity
 import com.dew.edward.dewbe.util.DEFAULT_QUERY
 import com.dew.edward.dewbe.util.KEY_QUERY
 import com.dew.edward.dewbe.util.VIDEO_MODEL
@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initSearchView(searchView: SearchView) {
         searchView.layoutDirection = View.LAYOUT_DIRECTION_RTL
-        searchView.layoutParams = ActionBar.LayoutParams(Gravity.END)
+        searchView.layoutParams = ActionBar.LayoutParams(Gravity.END) as ViewGroup.LayoutParams?
         searchView.queryHint = "Search Movie ..."
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {

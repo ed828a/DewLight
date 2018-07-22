@@ -1,10 +1,9 @@
-package com.dew.edward.dewbe.ui
+package com.dew.edward.dewbe
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.multidex.MultiDexApplication
 import android.support.v4.content.LocalBroadcastManager
-import android.util.Log
 import com.google.android.youtube.player.YouTubePlayer
 
 
