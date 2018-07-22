@@ -1,6 +1,7 @@
 package com.dew.edward.dewbe.ui
 
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.arch.paging.PagedList
 import android.content.Context
 import android.content.pm.ActivityInfo
@@ -20,6 +21,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.commit451.youtubeextractor.YouTubeExtraction
 import com.commit451.youtubeextractor.YouTubeExtractor
+import com.dew.edward.dewbe.DewLightApp
 import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
@@ -28,6 +30,7 @@ import com.dew.edward.dewbe.model.Type
 import com.dew.edward.dewbe.model.VideoModel
 import com.dew.edward.dewbe.util.*
 import com.dew.edward.dewbe.viewmodel.VideoViewModel
+import com.dew.edward.dewbe.viewmodel.ViewModelFactory
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.DefaultRenderersFactory
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -40,12 +43,19 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_exo_video_play.*
 import kotlinx.android.synthetic.main.content_list.*
+import javax.inject.Inject
 
 class ExoVideoPlayActivity : AppCompatActivity() {
 
+//    @Inject
+//    lateinit var viewModelFactory: ViewModelFactory
+//    private val queryViewModel: VideoViewModel by lazy {
+//        ViewModelProviders.of(this, viewModelFactory).get(VideoViewModel::class.java)
+//    }
+
+    private lateinit var queryViewModel: VideoViewModel
     private lateinit var videoModel: VideoModel
     private var isRelatedVideo: Boolean = false
-    private lateinit var queryViewModel: VideoViewModel
     private lateinit var adapter: VideoModelAdapter
     private lateinit var listView: RecyclerView
 
@@ -64,6 +74,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exo_video_play)
+//        DewLightApp.appComponent.inject(this)
 
         if (ContextCompat.checkSelfPermission(this@ExoVideoPlayActivity,
                         android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -84,6 +95,7 @@ class ExoVideoPlayActivity : AppCompatActivity() {
             extractUrl(videoModel.videoId)
         }
 
+        // just for text dagger2, actually, this one make switching faster.
         queryViewModel = VideoViewModel.getViewModel(this)
 
         if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
@@ -95,7 +107,6 @@ class ExoVideoPlayActivity : AppCompatActivity() {
             queryViewModel.showRelatedToVideoId(videoModel.videoId)
             backStack.push(QueryData(videoModel.videoId, type = Type.RELATED_VIDEO_ID))
         }
-
     }
 
     private fun extractUrl(videoId: String) {

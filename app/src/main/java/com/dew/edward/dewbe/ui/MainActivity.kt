@@ -2,6 +2,7 @@ package com.dew.edward.dewbe.ui
 
 
 import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.arch.paging.PagedList
 import android.content.Context
 import android.content.Intent
@@ -19,6 +20,7 @@ import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import com.dew.edward.dewbe.DewLightApp
 import com.dew.edward.dewbe.R
 import com.dew.edward.dewbe.adapter.VideoModelAdapter
 import com.dew.edward.dewbe.model.NetworkState
@@ -27,8 +29,10 @@ import com.dew.edward.dewbe.util.DEFAULT_QUERY
 import com.dew.edward.dewbe.util.KEY_QUERY
 import com.dew.edward.dewbe.util.VIDEO_MODEL
 import com.dew.edward.dewbe.viewmodel.VideoViewModel
+import com.dew.edward.dewbe.viewmodel.ViewModelFactory
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import javax.inject.Inject
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,21 +41,25 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
     }
 
-    private lateinit var videoViewModel: VideoViewModel
+    @Inject lateinit var viewModelFactory: ViewModelFactory
+    private val videoViewModel: VideoViewModel by lazy {
+        ViewModelProviders.of(this, viewModelFactory).get(VideoViewModel::class.java)
+    }
     private lateinit var preferences: SharedPreferences
     private lateinit var query: String
     private var searchView: SearchView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+        DewLightApp.appComponent.inject(this)
 
-        preferences = getPreferences(Context.MODE_PRIVATE)
+        preferences = DewLightApp.sharedPreferences
         query = preferences.getString(KEY_QUERY, DEFAULT_QUERY)
 
         initActionBar()
-        videoViewModel = VideoViewModel.getViewModel(this@MainActivity)
         initRecyclerView()
         initSwipeToRefresh()
 

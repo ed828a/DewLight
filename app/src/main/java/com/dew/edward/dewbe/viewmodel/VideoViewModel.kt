@@ -6,12 +6,15 @@ import com.dew.edward.dewbe.model.QueryData
 import com.dew.edward.dewbe.model.Type
 import com.dew.edward.dewbe.repository.YoutubeRepository
 import com.dew.edward.dewbe.util.PAGEDLIST_PAGE_SIZE
+import javax.inject.Inject
 
 
 /**
  * Created by Edward on 6/26/2018.
  */
-class VideoViewModel(private val repository: YoutubeRepository): ViewModel() {
+class VideoViewModel @Inject constructor(
+        private val repository: YoutubeRepository
+): ViewModel() {
 
     private val queryString = MutableLiveData<String>()
     private val relatedToVideoId = MutableLiveData<String>()
